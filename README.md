@@ -28,6 +28,10 @@ cargo install mockser
 
 [Releases](https://github.com/daxartio/mockser/releases)
 
+```
+docker run --rm -p 3000:3000 -p 3001:3001 daxart/mockser
+```
+
 ## Usage
 
 ```
