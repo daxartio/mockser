@@ -1,7 +1,5 @@
 # Mockser
 
-WIP
-
 Configurable mock server for testing and development.
 
 The repository contains the implementation of a mock server that allows configuring and handling mock requests.
@@ -22,4 +20,49 @@ If no matching mock is found, it returns a 404 Not Found response.
 
 You can see the server in action by running the tests by `hurl tests/test.hurl`.
 
-I will add builds and releases soon.
+## Installation
+
+```sh
+cargo install mockser
+```
+
+[Releases](https://github.com/daxartio/mockser/releases)
+
+## Usage
+
+```
+POST http://127.0.0.1:3001/configure
+{
+    "name": "Test request",
+    "request": {
+        "uri": "/test",
+        "method": "POST",
+        "body": "{\"name\":\"Test request\"}",
+        "headers": {
+            "content-type": "application/json"
+        }
+    },
+    "response": {
+        "code": 201,
+        "body": "{\"name\":\"Test response\"}",
+        "headers": {
+            "content-type": "application/json",
+            "x-custom-header": "custom-value"
+        }
+    }
+}
+
+HTTP 201
+
+POST http://127.0.0.1:3000/test?param1=value1&param2=value2
+Content-Type: application/json
+{
+    "name": "Test request"
+}
+
+HTTP 201
+[Asserts]
+header "Content-Type" == "application/json"
+header "X-Custom-Header" == "custom-value"
+body == "{\"name\":\"Test response\"}"
+```
