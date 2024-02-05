@@ -25,7 +25,7 @@ struct Mock {
 #[derive(serde::Deserialize, Clone)]
 #[allow(unused)]
 struct MockRequest {
-    uri: String,
+    path: String,
     #[serde(default = "default_method")]
     method: String,
     body: Option<String>,
@@ -61,7 +61,7 @@ async fn configure_mock(
     Json(config): Json<Mock>,
 ) -> impl IntoResponse {
     let mut configs = state.configs.lock().await;
-    let url = config.request.uri.clone();
+    let url = config.request.path.clone();
 
     configs.insert(url, config);
 

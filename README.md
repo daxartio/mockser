@@ -35,7 +35,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/test",
+        "path": "/test",
         "method": "POST",
         "body": "{\"name\":\"Test request\"}",
         "headers": {

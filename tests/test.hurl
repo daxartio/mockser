@@ -3,7 +3,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/test",
+        "path": "/test",
         "method": "POST",
         "body": "{\"name\":\"Test request\"}",
         "headers": {
@@ -42,7 +42,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/test-with-no-body",
+        "path": "/test-with-no-body",
         "method": "POST"
     },
     "response": {
@@ -68,7 +68,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/test-method-get",
+        "path": "/test-method-get",
         "method": "GET"
     },
     "response": {
@@ -94,7 +94,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/test-method-delete",
+        "path": "/test-method-delete",
         "method": "DELETE"
     },
     "response": {
@@ -120,7 +120,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/test-method-patch",
+        "path": "/test-method-patch",
         "method": "PATCH"
     },
     "response": {
@@ -146,7 +146,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/test-method-put",
+        "path": "/test-method-put",
         "method": "PUT"
     },
     "response": {
@@ -172,7 +172,7 @@ POST http://127.0.0.1:3001/configure
 {
     "name": "Test request",
     "request": {
-        "uri": "/",
+        "path": "/",
         "method": "GET"
     },
     "response": {
