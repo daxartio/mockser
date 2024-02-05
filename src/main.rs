@@ -73,12 +73,8 @@ async fn configure_mock(
 async fn handle(
     State(state): State<MockServerState>,
     req: Request,
-    next: Next,
+    _next: Next,
 ) -> impl IntoResponse {
-    if req.method() == axum::http::Method::POST && req.uri().path() == "/configure" {
-        return next.run(req).await;
-    }
-
     let path = req.uri().path().to_string();
 
     let configs = state.configs.lock().await;
