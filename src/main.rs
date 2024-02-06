@@ -12,7 +12,13 @@ use axum::{
     routing::post,
     Json, Router,
 };
-use tokio::{signal, sync::Mutex};
+use tokio::{
+    signal::{
+        self,
+        unix::{signal, SignalKind},
+    },
+    sync::Mutex,
+};
 
 #[derive(serde::Deserialize, Clone)]
 struct Mock {
@@ -61,11 +67,11 @@ async fn configure_mock(
     Json(config): Json<Mock>,
 ) -> impl IntoResponse {
     let mut configs = state.configs.lock().await;
-    let url = config.request.path.clone();
+    let path = config.request.path.clone();
 
-    configs.insert(url, config);
+    log::info!("Configure updated for {}", path);
 
-    log::info!("Configure updated");
+    configs.insert(path, config);
 
     StatusCode::CREATED
 }
@@ -105,7 +111,7 @@ async fn handle(
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logger::init();
     let settings = settings::Settings::new("mockser").unwrap();
 
@@ -135,12 +141,13 @@ async fn main() {
         axum::serve(config_listener, config_app).await.unwrap();
     });
 
-    match signal::ctrl_c().await {
-        Ok(()) => {
-            log::info!("Shutting down");
-        }
-        Err(err) => {
-            log::error!("Unable to listen for shutdown signal: {}", err)
-        }
+    let mut shutdown_recv = signal(SignalKind::terminate())?;
+
+    tokio::select! {
+        _ = signal::ctrl_c() => {},
+        _ = shutdown_recv.recv() => {},
     }
+    log::info!("Shutting down");
+
+    Ok(())
 }
