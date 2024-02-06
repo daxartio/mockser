@@ -17,7 +17,7 @@ use tokio::{
         self,
         unix::{signal, SignalKind},
     },
-    sync::Mutex,
+    sync::RwLock,
 };
 
 #[derive(serde::Deserialize, Clone)]
@@ -45,15 +45,17 @@ struct MockResponse {
     headers: HashMap<String, String>,
 }
 
+type SharedMockServerState = Arc<RwLock<MockServerState>>;
+
 #[derive(Clone)]
 struct MockServerState {
-    configs: Arc<Mutex<HashMap<String, Mock>>>,
+    configs: HashMap<String, Mock>,
 }
 
 impl MockServerState {
     fn new() -> Self {
         MockServerState {
-            configs: Arc::new(Mutex::new(HashMap::new())),
+            configs: HashMap::new(),
         }
     }
 }
@@ -63,27 +65,27 @@ fn default_method() -> String {
 }
 
 async fn configure_mock(
-    State(state): State<MockServerState>,
+    State(state): State<SharedMockServerState>,
     Json(config): Json<Mock>,
 ) -> impl IntoResponse {
-    let mut configs = state.configs.lock().await;
     let path = config.request.path.clone();
 
     log::info!("Configure updated for {}", path);
 
-    configs.insert(path, config);
+    state.write().await.configs.insert(path, config);
 
     StatusCode::CREATED
 }
 
 async fn handle(
-    State(state): State<MockServerState>,
+    State(state): State<SharedMockServerState>,
     req: Request,
     _next: Next,
 ) -> impl IntoResponse {
     let path = req.uri().path().to_string();
 
-    let configs = state.configs.lock().await;
+    let state = &state.read().await;
+    let configs = &state.configs;
     let config = match configs.get(&path) {
         Some(config) => config.clone(),
         None => {
@@ -113,25 +115,27 @@ async fn handle(
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logger::init();
-    let settings = settings::Settings::new("mockser").unwrap();
+    let settings = settings::Settings::new("mockser")?;
 
-    let state = MockServerState::new();
+    log::info!("Starting with settings: {:?}", settings);
+
+    let state = SharedMockServerState::new(RwLock::new(MockServerState::new()));
 
     let app = Router::new()
-        .layer(middleware::from_fn_with_state(state.clone(), handle))
-        .with_state(state.clone());
+        .layer(middleware::from_fn_with_state(Arc::clone(&state), handle))
+        .with_state(Arc::clone(&state));
 
     let config_app = Router::new()
         .route("/configure", post(configure_mock))
-        .with_state(state.clone());
+        .with_state(Arc::clone(&state));
 
     let addr = format!("{}:{}", settings.host, settings.port);
     log::info!("Listening on {}", addr);
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await?;
 
     let addr = format!("{}:{}", settings.host, settings.config_port);
     log::info!("Listening config on {}", addr);
-    let config_listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let config_listener = tokio::net::TcpListener::bind(addr).await?;
 
     tokio::spawn(async move {
         axum::serve(listener, app).await.unwrap();
