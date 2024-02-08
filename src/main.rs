@@ -1,4 +1,5 @@
 mod handlers;
+mod initial_configs;
 mod logger;
 mod schemas;
 mod settings;
@@ -17,17 +18,30 @@ use tokio::signal::{
 
 use crate::{
     handlers::{handle_configuration, handle_mock_request},
+    initial_configs::new_shared_mock_server_state_from_file,
     schemas::new_shared_mock_server_state,
 };
+
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logger::init();
     let settings = settings::Settings::new("mockser")?;
 
-    log::info!("Starting with settings: {:?}", settings);
+    log::info!("Starting mockser {} with settings: {:?}", VERSION, settings);
 
-    let state = new_shared_mock_server_state();
+    let state = if let Some(initial_configs) = settings.initial_configs {
+        match new_shared_mock_server_state_from_file(initial_configs).await {
+            Ok(state) => state,
+            Err(e) => {
+                log::error!("Failed to load initial configs: {}", e);
+                new_shared_mock_server_state()
+            }
+        }
+    } else {
+        new_shared_mock_server_state()
+    };
 
     let app = Router::new()
         .layer(middleware::from_fn_with_state(

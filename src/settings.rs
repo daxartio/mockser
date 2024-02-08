@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use config::{Config, ConfigError, Environment};
 use serde::Deserialize;
 
@@ -9,6 +11,8 @@ pub struct Settings {
     pub config_port: u16,
     #[serde(default = "default_host")]
     pub host: String,
+
+    pub initial_configs: Option<PathBuf>,
 }
 
 fn default_port() -> u16 {

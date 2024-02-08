@@ -1,0 +1,21 @@
+[
+    {
+        "name": "Test request",
+        "request": {
+            "path": "/test",
+            "method": "POST",
+            "body": "{\"name\":\"Test request\"}",
+            "headers": {
+                "content-type": "application/json"
+            }
+        },
+        "response": {
+            "code": 201,
+            "body": "{\"name\":\"Test response\"}",
+            "headers": {
+                "content-type": "application/json",
+                "x-custom-header": "custom-value"
+            }
+        }
+    }
+]
