@@ -70,3 +70,14 @@ header "Content-Type" == "application/json"
 header "X-Custom-Header" == "custom-value"
 body == "{\"name\":\"Test response\"}"
 ```
+
+## Configuration
+
+The server can be configured using environment variables.
+
+| name                    | type   | default   |
+|-------------------------|--------|-----------|
+| MOCKSER_HOST            | string | '0.0.0.0' |
+| MOCKSER_PORT            | number | 3000      |
+| MOCKSER_CONFIG_PORT     | number | 3001      |
+| MOCKSER_INITIAL_CONFIGS | path   | None      |
