@@ -11,10 +11,7 @@ use axum::{
     routing::post,
     Router,
 };
-use tokio::signal::{
-    self,
-    unix::{signal, SignalKind},
-};
+use tokio::signal;
 
 use crate::{
     handlers::{handle_configuration, handle_mock_request},
@@ -70,13 +67,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         axum::serve(config_listener, config_app).await.unwrap();
     });
 
-    let mut shutdown_recv = signal(SignalKind::terminate())?;
-
-    tokio::select! {
-        _ = signal::ctrl_c() => {},
-        _ = shutdown_recv.recv() => {},
+    match signal::ctrl_c().await {
+        Ok(()) => {
+            log::info!("Shutting down");
+        }
+        Err(err) => {
+            log::error!("Unable to listen for shutdown signal: {}", err)
+        }
     }
-    log::info!("Shutting down");
 
     Ok(())
 }
