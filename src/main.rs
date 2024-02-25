@@ -11,6 +11,7 @@ use axum::{
     routing::post,
     Router,
 };
+use human_panic::setup_panic;
 use tokio::signal;
 
 use crate::{
@@ -23,6 +24,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    setup_panic!();
     logger::init();
     let settings = settings::Settings::new("mockser")?;
 
