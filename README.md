@@ -80,3 +80,5 @@ The server can be configured using environment variables.
 | MOCKSER_PORT            | number | 3000      |
 | MOCKSER_CONFIG_PORT     | number | 3001      |
 | MOCKSER_INITIAL_CONFIGS | path   | None      |
+| MOCKSER_LOG             | string | 'info'    |
+| MOCKSER_LOG_STYLE       | string | 'auto'    |
