@@ -5,7 +5,6 @@ POST http://127.0.0.1:3001/configure
     "request": {
         "path": "/test",
         "method": "POST",
-        "body": "{\"name\":\"Test request\"}",
         "headers": {
             "content-type": "application/json"
         }
@@ -192,3 +191,30 @@ HTTP 200
 [Asserts]
 header "Content-Type" == "application/json"
 body == "{\"name\":\"Test response\"}"
+
+# Test invalid headers
+POST http://127.0.0.1:3001/configure
+{
+    "name": "Test request",
+    "request": {
+        "path": "/",
+        "method": "GET",
+        "headers": {
+            "X-Request-Id": "1"
+        }
+    },
+    "response": {
+        "code": 200,
+        "body": "{\"name\":\"Test response\"}",
+        "headers": {
+            "content-type": "application/json"
+        }
+    }
+}
+
+HTTP 201
+
+PUT http://127.0.0.1:3000
+X-Request-Id: 2
+
+HTTP 500

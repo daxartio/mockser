@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use axum::{
     body::Body,
     extract::{Request, State},
@@ -44,6 +46,24 @@ pub async fn handle_mock_request(
 
     log::info!("Config found for {} - {}", path, config.name);
 
+    if let Some(headers) = config.request.headers {
+        if compare_headers(
+            &headers,
+            &req.headers()
+                .iter()
+                .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap().to_string()))
+                .collect(),
+        ) {
+            log::info!("Headers match for {}", path);
+        } else {
+            log::error!("Headers do not match for {}", path);
+            return Response::builder()
+                .status(StatusCode::INTERNAL_SERVER_ERROR)
+                .body(Body::empty())
+                .unwrap();
+        }
+    }
+
     let response = axum::http::Response::builder().status(config.response.code);
 
     let response = config
@@ -55,4 +75,10 @@ pub async fn handle_mock_request(
         });
 
     response.body(Body::from(config.response.body)).unwrap()
+}
+
+fn compare_headers(expected: &HashMap<String, String>, actual: &HashMap<String, String>) -> bool {
+    expected
+        .iter()
+        .all(|(key, value)| actual.get(key).map_or(false, |v| v == value))
 }

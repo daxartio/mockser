@@ -41,7 +41,6 @@ POST http://127.0.0.1:3001/configure
     "request": {
         "path": "/test",
         "method": "POST",
-        "body": "{\"name\":\"Test request\"}",
         "headers": {
             "content-type": "application/json"
         }
