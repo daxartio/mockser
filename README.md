@@ -9,7 +9,6 @@ The server uses the Axum framework for handling HTTP requests and responses.
 It maintains a state that holds the configurations of the mocks, which are stored in a HashMap.
 
 The server also listens on a separate port for configuration requests, allowing dynamic updates to the mock configurations.
-It gracefully shuts down when a SIGINT signal is received. SIGTERM is in progress.
 
 To configure a mock, send a POST request to the `/configure` endpoint with the mock configuration in the request body.
 The mock configuration should include the request URI, method, body, and headers, as well as the response code, body, and headers.

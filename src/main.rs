@@ -3,6 +3,7 @@ mod initial_configs;
 mod logger;
 mod schemas;
 mod settings;
+mod shutdown;
 
 use std::sync::Arc;
 
@@ -11,8 +12,6 @@ use axum::{
     routing::post,
     Router,
 };
-
-use tokio::signal;
 
 use crate::{
     handlers::{handle_configuration, handle_mock_request},
@@ -68,7 +67,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         axum::serve(config_listener, config_app).await.unwrap();
     });
 
-    match signal::ctrl_c().await {
+    match shutdown::wait().await {
         Ok(()) => {
             log::info!("Shutting down");
         }
