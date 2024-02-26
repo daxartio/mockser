@@ -20,11 +20,12 @@ use crate::{
 };
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
+const NAME: &str = env!("CARGO_PKG_NAME");
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    logger::init();
-    let settings = settings::Settings::new("mockser")?;
+    logger::init(NAME);
+    let settings = settings::Settings::new(NAME)?;
 
     log::info!("Starting mockser {} with settings: {:?}", VERSION, settings);
 

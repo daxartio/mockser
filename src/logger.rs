@@ -5,31 +5,35 @@ use std::{
     panic, thread,
 };
 
-pub fn init() {
-    let format = env::var("MOCKSER_LOG_FORMAT").unwrap_or_else(|_| "human".to_string());
+pub fn init(prefix: &str) {
+    let prefix = prefix.to_uppercase();
+    let log_format_env = format!("{}_LOG_FORMAT", prefix);
+    let format = env::var(log_format_env).unwrap_or_else(|_| "human".to_string());
     match format.as_str() {
-        "json" => init_json(),
-        _ => init_human(),
+        "json" => init_json(prefix.as_str()),
+        _ => init_human(prefix.as_str()),
     }
 }
 
-fn new_env() -> Env<'static> {
+fn new_env(prefix: &str) -> Env<'static> {
+    let filter_env = format!("{}_LOG", prefix);
+    let style_env = format!("{}_LOG_STYLE", prefix);
     Env::new()
-        .filter_or("MOCKSER_LOG", "info")
-        .write_style("MOCKSER_LOG_STYLE")
+        .filter_or(filter_env, "info")
+        .write_style(style_env)
 }
 
-fn init_human() {
+fn init_human(prefix: &str) {
     human_panic::setup_panic!();
 
-    Builder::from_env(new_env())
+    Builder::from_env(new_env(prefix))
         .format_timestamp_millis()
         .init();
 }
 
-fn init_json() {
+fn init_json(prefix: &str) {
     panic_hook();
-    Builder::from_env(new_env()).format(write_json).init();
+    Builder::from_env(new_env(prefix)).format(write_json).init();
 }
 
 fn write_json<F>(f: &mut F, record: &log::Record) -> io::Result<()>
