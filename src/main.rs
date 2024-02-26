@@ -8,13 +8,15 @@ mod shutdown;
 use std::sync::Arc;
 
 use axum::{
-    middleware::{self},
-    routing::post,
+    middleware,
+    routing::{delete, post},
     Router,
 };
 
 use crate::{
-    handlers::{handle_configuration, handle_mock_request},
+    handlers::{
+        handle_clear, handle_configuration, handle_delete_configuration, handle_mock_request,
+    },
     initial_configs::new_shared_mock_server_state_from_file,
     schemas::new_shared_mock_server_state,
 };
@@ -50,6 +52,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let config_app = Router::new()
         .route("/configure", post(handle_configuration))
+        .route("/configure", delete(handle_delete_configuration))
+        .route("/clear", post(handle_clear))
         .with_state(Arc::clone(&state));
 
     let addr = format!("{}:{}", settings.host, settings.port);

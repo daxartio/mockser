@@ -9,7 +9,7 @@ use axum::{
     Json,
 };
 
-use crate::schemas::{Mock, SharedMockServerState};
+use crate::schemas::{Mock, MockToDelete, SharedMockServerState};
 
 pub async fn handle_configuration(
     State(state): State<SharedMockServerState>,
@@ -22,6 +22,27 @@ pub async fn handle_configuration(
     state.write().await.configs.insert(path, config);
 
     StatusCode::CREATED
+}
+
+pub async fn handle_delete_configuration(
+    State(state): State<SharedMockServerState>,
+    Json(config): Json<MockToDelete>,
+) -> impl IntoResponse {
+    let path = config.request.path.clone();
+
+    log::info!("Configure deleted for {}", path);
+
+    state.write().await.configs.remove(&path);
+
+    StatusCode::NO_CONTENT
+}
+
+pub async fn handle_clear(State(state): State<SharedMockServerState>) -> impl IntoResponse {
+    log::info!("Clearing all configurations");
+
+    state.write().await.configs.clear();
+
+    StatusCode::NO_CONTENT
 }
 
 pub async fn handle_mock_request(

@@ -11,6 +11,11 @@ pub struct Mock {
 }
 
 #[derive(serde::Deserialize, Clone)]
+pub struct MockToDelete {
+    pub request: MockRequest,
+}
+
+#[derive(serde::Deserialize, Clone)]
 #[allow(unused)]
 pub struct MockRequest {
     pub path: String,

@@ -218,3 +218,63 @@ PUT http://127.0.0.1:3000
 X-Request-Id: 2
 
 HTTP 500
+
+# Test delete a configuration
+POST http://127.0.0.1:3001/configure
+{
+    "name": "Test request",
+    "request": {
+        "path": "/will-be-deleted",
+        "method": "GET"
+    },
+    "response": {
+        "code": 200,
+        "body": "{\"name\":\"Test response\"}",
+        "headers": {
+            "content-type": "application/json"
+        }
+    }
+}
+
+HTTP 201
+
+DELETE http://127.0.0.1:3001/configure
+{
+    "request": {
+        "path": "/will-be-deleted",
+        "method": "GET"
+    }
+}
+
+HTTP 204
+
+PUT http://127.0.0.1:3000/will-be-deleted
+
+HTTP 404
+
+# Test clear all configurations
+POST http://127.0.0.1:3001/configure
+{
+    "name": "Test request",
+    "request": {
+        "path": "/will-be-deleted",
+        "method": "GET"
+    },
+    "response": {
+        "code": 200,
+        "body": "{\"name\":\"Test response\"}",
+        "headers": {
+            "content-type": "application/json"
+        }
+    }
+}
+
+HTTP 201
+
+POST http://127.0.0.1:3001/clear
+
+HTTP 204
+
+PUT http://127.0.0.1:3000/will-be-deleted
+
+HTTP 404
