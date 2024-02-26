@@ -15,3 +15,13 @@ test:
 .PHONY: fmt
 fmt:
 	cargo +nightly fmt --all
+
+.PHONY: docker-build
+docker-build:
+	docker build -t daxart/mockser -f Dockerfile --build-arg MOCKSER_VERSION=$(v) .
+	docker tag daxart/mockser daxart/mockser:$(shell echo $(v) | cut -d. -f1,2)
+
+.PHONY: docker-push
+docker-push:
+	docker push daxart/mockser:$(shell echo $(v) | cut -d. -f1,2)
+	docker push daxart/mockser
