@@ -11,7 +11,9 @@ pub async fn new_shared_mock_server_state_from_file(
         let mut state = state.write().await;
         state.configs = HashMap::with_capacity(mocks.len());
         for mock in mocks {
-            state.configs.insert(mock.request.path.clone(), mock);
+            let path = mock.request.path.clone();
+            let method = mock.request.method.clone();
+            state.configs.insert((path, method), mock);
         }
     }
 

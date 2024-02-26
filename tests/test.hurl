@@ -185,7 +185,7 @@ POST http://127.0.0.1:3001/configure
 
 HTTP 201
 
-PUT http://127.0.0.1:3000
+GET http://127.0.0.1:3000
 
 HTTP 200
 [Asserts]
@@ -214,7 +214,7 @@ POST http://127.0.0.1:3001/configure
 
 HTTP 201
 
-PUT http://127.0.0.1:3000
+GET http://127.0.0.1:3000
 X-Request-Id: 2
 
 HTTP 500
@@ -248,7 +248,7 @@ DELETE http://127.0.0.1:3001/configure
 
 HTTP 204
 
-PUT http://127.0.0.1:3000/will-be-deleted
+GET http://127.0.0.1:3000/will-be-deleted
 
 HTTP 404
 
@@ -275,6 +275,6 @@ POST http://127.0.0.1:3001/clear
 
 HTTP 204
 
-PUT http://127.0.0.1:3000/will-be-deleted
+GET http://127.0.0.1:3000/will-be-deleted
 
 HTTP 404

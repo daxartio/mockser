@@ -40,7 +40,7 @@ pub fn new_shared_mock_server_state() -> SharedMockServerState {
 
 #[derive(Clone)]
 pub struct MockServerState {
-    pub configs: HashMap<String, Mock>,
+    pub configs: HashMap<(String, String), Mock>,
 }
 
 impl MockServerState {

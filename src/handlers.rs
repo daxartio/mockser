@@ -16,10 +16,11 @@ pub async fn handle_configuration(
     Json(config): Json<Mock>,
 ) -> impl IntoResponse {
     let path = config.request.path.clone();
+    let method = config.request.method.clone();
 
     log::info!("Configure updated for {}", path);
 
-    state.write().await.configs.insert(path, config);
+    state.write().await.configs.insert((path, method), config);
 
     StatusCode::CREATED
 }
@@ -29,10 +30,11 @@ pub async fn handle_delete_configuration(
     Json(config): Json<MockToDelete>,
 ) -> impl IntoResponse {
     let path = config.request.path.clone();
+    let method = config.request.method.clone();
 
     log::info!("Configure deleted for {}", path);
 
-    state.write().await.configs.remove(&path);
+    state.write().await.configs.remove(&(path, method));
 
     StatusCode::NO_CONTENT
 }
@@ -51,10 +53,11 @@ pub async fn handle_mock_request(
     _next: Next,
 ) -> impl IntoResponse {
     let path = req.uri().path().to_string();
+    let method = req.method().to_string();
 
     let state = &state.read().await;
     let configs = &state.configs;
-    let config = match configs.get(&path) {
+    let config = match configs.get(&(path.clone(), method)) {
         Some(config) => config.clone(),
         None => {
             log::error!("No config found for {}", path);
