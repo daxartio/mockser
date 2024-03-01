@@ -2,6 +2,9 @@ use std::{collections::HashMap, sync::Arc};
 
 use tokio::sync::RwLock;
 
+type Path = String;
+type Method = String;
+
 #[derive(serde::Deserialize, Clone)]
 pub struct Mock {
     #[serde(default)]
@@ -18,9 +21,9 @@ pub struct MockToDelete {
 #[derive(serde::Deserialize, Clone)]
 #[allow(unused)]
 pub struct MockRequest {
-    pub path: String,
+    pub path: Path,
     #[serde(default = "default_method")]
-    pub method: String,
+    pub method: Method,
     pub body: Option<String>,
     pub headers: Option<HashMap<String, String>>,
 }
@@ -40,7 +43,7 @@ pub fn new_shared_mock_server_state() -> SharedMockServerState {
 
 #[derive(Clone)]
 pub struct MockServerState {
-    pub configs: HashMap<(String, String), Mock>,
+    pub configs: HashMap<(Path, Method), Mock>,
 }
 
 impl MockServerState {

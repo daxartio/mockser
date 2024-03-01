@@ -1,5 +1,8 @@
 DEFAULT_GOAL := all
 
+DOCKER_IMAGE_NAME := daxart/mockser
+DOCKER_BUILD_ARGS := --build-arg MOCKSER_VERSION=$(v)
+
 .PHONY: all
 all: fmt check test
 
@@ -18,10 +21,10 @@ fmt:
 
 .PHONY: docker-build
 docker-build:
-	docker build -t daxart/mockser -f Dockerfile --build-arg MOCKSER_VERSION=$(v) .
-	docker tag daxart/mockser daxart/mockser:$(shell echo $(v) | cut -d. -f1,2)
+	docker build -t $(DOCKER_IMAGE_NAME) -f Dockerfile $(DOCKER_BUILD_ARGS) .
+	docker tag $(DOCKER_IMAGE_NAME) $(DOCKER_IMAGE_NAME):$(shell echo $(v) | cut -d. -f1,2)
 
 .PHONY: docker-push
 docker-push:
-	docker push daxart/mockser:$(shell echo $(v) | cut -d. -f1,2)
-	docker push daxart/mockser
+	docker push $(DOCKER_IMAGE_NAME):$(shell echo $(v) | cut -d. -f1,2)
+	docker push $(DOCKER_IMAGE_NAME)
