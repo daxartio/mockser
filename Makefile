@@ -13,7 +13,10 @@ check:
 
 .PHONY: test
 test:
+	cargo run & echo $$! > .pid
+	sleep 1
 	cargo test
+	kill `cat .pid`
 
 .PHONY: fmt
 fmt:
