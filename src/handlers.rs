@@ -17,10 +17,15 @@ pub async fn handle_configuration(
 ) -> impl IntoResponse {
     let path = config.request.path.clone();
     let method = config.request.method.clone();
+    let query = config.request.query.clone();
 
-    log::info!("Configure updated for {}", path);
+    log::info!("Configure updated for {} {}", method, path);
 
-    state.write().await.configs.insert((path, method), config);
+    state
+        .write()
+        .await
+        .configs
+        .insert((path, method, query), config);
 
     StatusCode::CREATED
 }
@@ -31,10 +36,11 @@ pub async fn handle_delete_configuration(
 ) -> impl IntoResponse {
     let path = config.request.path.clone();
     let method = config.request.method.clone();
+    let query = config.request.query.clone();
 
-    log::info!("Configure deleted for {}", path);
+    log::info!("Configure deleted for {} {}", method, path);
 
-    state.write().await.configs.remove(&(path, method));
+    state.write().await.configs.remove(&(path, method, query));
 
     StatusCode::NO_CONTENT
 }
@@ -54,13 +60,14 @@ pub async fn handle_mock_request(
 ) -> impl IntoResponse {
     let path = req.uri().path().to_string();
     let method = req.method().to_string();
+    let query = req.uri().query().unwrap_or_default();
 
     let state = &state.read().await;
     let configs = &state.configs;
-    let config = match configs.get(&(path.clone(), method)) {
+    let config = match configs.get(&(path.clone(), method.clone(), query.to_string())) {
         Some(config) => config.clone(),
         None => {
-            log::error!("No config found for {}", path);
+            log::error!("No config found for {} {}", method, path);
             return Response::builder()
                 .status(StatusCode::NOT_FOUND)
                 .body(Body::empty())
@@ -68,7 +75,7 @@ pub async fn handle_mock_request(
         }
     };
 
-    log::info!("Config found for {} - {}", path, config.name);
+    log::info!("Config found for {} {} - {}", method, path, config.name);
 
     if let Some(headers) = config.request.headers {
         if compare_headers(
@@ -78,9 +85,9 @@ pub async fn handle_mock_request(
                 .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap().to_string()))
                 .collect(),
         ) {
-            log::info!("Headers match for {}", path);
+            log::info!("Headers match for {} {}", method, path);
         } else {
-            log::error!("Headers do not match for {}", path);
+            log::error!("Headers do not match for {} {}", method, path);
             return Response::builder()
                 .status(StatusCode::INTERNAL_SERVER_ERROR)
                 .body(Body::empty())

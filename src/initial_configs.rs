@@ -13,7 +13,8 @@ pub async fn new_shared_mock_server_state_from_file(
         for mock in mocks {
             let path = mock.request.path.clone();
             let method = mock.request.method.clone();
-            state.configs.insert((path, method), mock);
+            let query = mock.request.query.clone();
+            state.configs.insert((path, method, query), mock);
         }
     }
 

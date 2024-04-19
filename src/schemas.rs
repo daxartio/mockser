@@ -4,6 +4,7 @@ use tokio::sync::RwLock;
 
 type Path = String;
 type Method = String;
+type Query = String;
 
 #[derive(serde::Deserialize, Clone)]
 pub struct Mock {
@@ -24,6 +25,8 @@ pub struct MockRequest {
     pub path: Path,
     #[serde(default = "default_method")]
     pub method: Method,
+    #[serde(default = "default_query")]
+    pub query: Query,
     pub body: Option<String>,
     pub headers: Option<HashMap<String, String>>,
 }
@@ -43,7 +46,7 @@ pub fn new_shared_mock_server_state() -> SharedMockServerState {
 
 #[derive(Clone)]
 pub struct MockServerState {
-    pub configs: HashMap<(Path, Method), Mock>,
+    pub configs: HashMap<(Path, Method, Query), Mock>,
 }
 
 impl MockServerState {
@@ -56,4 +59,8 @@ impl MockServerState {
 
 fn default_method() -> String {
     "GET".to_string()
+}
+
+fn default_query() -> String {
+    "".to_string()
 }
