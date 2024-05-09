@@ -40,6 +40,7 @@ POST http://127.0.0.1:3001/configure
     "request": {
         "path": "/test",
         "method": "POST",
+        "query": "param1=value1&param2=value2",
         "headers": {
             "content-type": "application/json"
         }
