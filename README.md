@@ -1,5 +1,7 @@
 # Mockser
 
+[![Crates.io](https://img.shields.io/crates/v/mockser.svg)](https://crates.io/crates/mockser)
+
 Configurable mock server for testing and development.
 
 The repository contains the implementation of a mock server that allows configuring and handling mock requests.
