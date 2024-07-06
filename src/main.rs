@@ -14,9 +14,7 @@ use axum::{
 };
 
 use crate::{
-    handlers::{
-        handle_clear, handle_configuration, handle_delete_configuration, handle_mock_request,
-    },
+    handlers::{handle_clear, handle_delete_config, handle_mock_request, handle_update_config},
     initial_configs::new_shared_mock_server_state_from_file,
     schemas::new_shared_mock_server_state,
 };
@@ -29,13 +27,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logger::init(NAME);
     let settings = settings::Settings::new(NAME)?;
 
-    log::info!("Starting mockser {} with settings: {:?}", VERSION, settings);
+    log::info!(settings, version = VERSION; "Starting mockser");
 
     let state = if let Some(initial_configs) = settings.initial_configs {
         match new_shared_mock_server_state_from_file(initial_configs).await {
             Ok(state) => state,
             Err(e) => {
-                log::error!("Failed to load initial configs: {}", e);
+                log::error!(error = e.to_string(); "Failed to load initial configs");
                 new_shared_mock_server_state()
             }
         }
@@ -51,8 +49,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(Arc::clone(&state));
 
     let config_app = Router::new()
-        .route("/configure", post(handle_configuration))
-        .route("/configure", delete(handle_delete_configuration))
+        .route("/configure", post(handle_update_config))
+        .route("/configure", delete(handle_delete_config))
         .route("/clear", post(handle_clear))
         .with_state(Arc::clone(&state));
 
@@ -77,7 +75,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             log::info!("Shutting down");
         }
         Err(err) => {
-            log::error!("Unable to listen for shutdown signal: {}", err)
+            log::error!(error = err.to_string(); "Unable to listen for shutdown signal")
         }
     }
 

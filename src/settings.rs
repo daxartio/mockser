@@ -1,9 +1,10 @@
 use std::path::PathBuf;
 
 use config::{Config, ConfigError, Environment};
-use serde::Deserialize;
+use log::kv::ToValue;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Settings {
     #[serde(default = "default_port")]
     pub port: u16,
@@ -34,5 +35,11 @@ impl Settings {
             .build()?;
 
         s.try_deserialize()
+    }
+}
+
+impl ToValue for Settings {
+    fn to_value(&self) -> log::kv::Value {
+        log::kv::Value::from_serde(self)
     }
 }

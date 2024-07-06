@@ -11,7 +11,7 @@ use axum::{
 
 use crate::schemas::{Mock, MockToDelete, SharedMockServerState};
 
-pub async fn handle_configuration(
+pub async fn handle_update_config(
     State(state): State<SharedMockServerState>,
     Json(config): Json<Mock>,
 ) -> impl IntoResponse {
@@ -19,7 +19,7 @@ pub async fn handle_configuration(
     let method = config.request.method.clone();
     let query = config.request.query.clone();
 
-    log::info!("Configure updated for {} {}", method, path);
+    log::info!(method, path, query; "Config updated");
 
     state
         .write()
@@ -30,7 +30,7 @@ pub async fn handle_configuration(
     StatusCode::CREATED
 }
 
-pub async fn handle_delete_configuration(
+pub async fn handle_delete_config(
     State(state): State<SharedMockServerState>,
     Json(config): Json<MockToDelete>,
 ) -> impl IntoResponse {
@@ -38,7 +38,7 @@ pub async fn handle_delete_configuration(
     let method = config.request.method.clone();
     let query = config.request.query.clone();
 
-    log::info!("Configure deleted for {} {}", method, path);
+    log::info!(method, path, query; "Config deleted");
 
     state.write().await.configs.remove(&(path, method, query));
 
@@ -46,7 +46,7 @@ pub async fn handle_delete_configuration(
 }
 
 pub async fn handle_clear(State(state): State<SharedMockServerState>) -> impl IntoResponse {
-    log::info!("Clearing all configurations");
+    log::info!("All config deleted");
 
     state.write().await.configs.clear();
 
@@ -67,7 +67,7 @@ pub async fn handle_mock_request(
     let config = match configs.get(&(path.clone(), method.clone(), query.to_string())) {
         Some(config) => config.clone(),
         None => {
-            log::error!("No config found for {} {}", method, path);
+            log::error!(method, path, query; "No config found");
             return Response::builder()
                 .status(StatusCode::NOT_FOUND)
                 .body(Body::empty())
@@ -75,7 +75,7 @@ pub async fn handle_mock_request(
         }
     };
 
-    log::info!("Config found for {} {} - {}", method, path, config.name);
+    log::info!(name = config.name, method, path, query; "Handle request");
 
     if let Some(headers) = config.request.headers {
         if compare_headers(
@@ -85,9 +85,9 @@ pub async fn handle_mock_request(
                 .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap().to_string()))
                 .collect(),
         ) {
-            log::info!("Headers match for {} {}", method, path);
+            log::info!(method, path, query; "Headers match");
         } else {
-            log::error!("Headers do not match for {} {}", method, path);
+            log::error!(method, path, query; "Headers do not match");
             return Response::builder()
                 .status(StatusCode::INTERNAL_SERVER_ERROR)
                 .body(Body::empty())
