@@ -84,4 +84,4 @@ The server can be configured using environment variables.
 | MOCKSER_INITIAL_CONFIGS | path   | None      |                     |
 | MOCKSER_LOG             | string | 'info'    | ...                 |
 | MOCKSER_LOG_STYLE       | string | 'auto'    | auto, always, never |
-| MOCKSER_LOG_FORMAT      | string | 'human'   | human, json         |
+| MOCKSER_LOG_FORMAT      | string | 'json'    | human, json         |
