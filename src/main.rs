@@ -7,11 +7,7 @@ mod shutdown;
 
 use std::sync::Arc;
 
-use axum::{
-    middleware,
-    routing::{delete, post},
-    Router,
-};
+use axum::{middleware, routing::post, Router};
 
 use crate::{
     handlers::{handle_clear, handle_delete_config, handle_mock_request, handle_update_config},
@@ -50,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let config_app = Router::new()
         .route("/configure", post(handle_update_config))
-        .route("/configure", delete(handle_delete_config))
+        .route("/delete", post(handle_delete_config))
         .route("/clear", post(handle_clear))
         .with_state(Arc::clone(&state));
 

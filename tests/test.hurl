@@ -239,7 +239,7 @@ POST http://127.0.0.1:3001/configure
 
 HTTP 201
 
-DELETE http://127.0.0.1:3001/configure
+POST http://127.0.0.1:3001/delete
 {
     "request": {
         "path": "/will-be-deleted",

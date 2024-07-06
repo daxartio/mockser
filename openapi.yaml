@@ -1,0 +1,116 @@
+openapi: 3.0.1
+info:
+  title: Mockser API
+  description: API for configuring mock responses
+  license:
+    name: MIT
+    url: https://en.wikipedia.org/wiki/MIT_License
+  version: 0.1.6
+servers:
+  - url: /
+paths:
+  /configure:
+    post:
+      summary: Configure mock response
+      operationId: updateConfig
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigureRequest'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+
+  /delete:
+    post:
+      summary: Delete mock response configuration
+      operationId: deleteConfig
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+
+  /clear:
+    post:
+      summary: Delete all mock response configurations
+      operationId: clearAll
+      security: []
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+components:
+  schemas:
+    Request:
+      type: object
+      required:
+        - path
+        - method
+        - query
+      properties:
+        path:
+          type: string
+          example: "/test"
+        method:
+          type: string
+          example: "POST"
+        body:
+          type: string
+          example: "{\"result\": \"ok\"}"
+        query:
+          type: string
+          example: "param1=value1&param2=value2"
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            content-type: "application/json"
+    ConfigureRequest:
+      type: object
+      required:
+        - request
+        - response
+      properties:
+        name:
+          type: string
+          example: "Test request"
+        request:
+          $ref: '#/components/schemas/Request'
+        response:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 201
+            body:
+              type: string
+              example: "{\"name\":\"Test response\"}"
+            headers:
+              type: object
+              additionalProperties:
+                type: string
+              example:
+                content-type: "application/json"
+                x-custom-header: "custom-value"
+    DeleteRequest:
+      type: object
+      required:
+        - request
+      properties:
+        request:
+          $ref: '#/components/schemas/Request'
