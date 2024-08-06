@@ -25,4 +25,4 @@ tracing-subscriber = "0.3.18"
 [dev-dependencies]
 hurl = "4.3.0"
 hurl_core = "4.3.0"
-rstest = "0.21.0"
+rstest = "0.22.0"
