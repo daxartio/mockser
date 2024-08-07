@@ -12,7 +12,7 @@ repository = "https://github.com/daxartio/mockser"
 [dependencies]
 axum = "0.7.5"
 config = "0.14.0"
-env_logger = { version = "0.11.3", features = ["unstable-kv", "humantime"]}
+env_logger = { version = "0.11.5", features = ["unstable-kv", "humantime"]}
 human-panic = "2.0.1"
 humantime = "2.1.0"
 log = { version = "0.4.22", features = ["kv", "kv_serde"]}
